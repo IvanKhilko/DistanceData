@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.entity.ContinentTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:56" hostname="IVANPC" time="0.005">
+  <properties/>
+  <testcase name="testAddCountry()" classname="org.example.distancedata.entity.ContinentTest" time="0.002"/>
+  <testcase name="testCascadeOnCountries()" classname="org.example.distancedata.entity.ContinentTest" time="0.0"/>
+  <testcase name="testAddRemoveLanguage()" classname="org.example.distancedata.entity.ContinentTest" time="0.0"/>
+  <testcase name="testContinentProperties()" classname="org.example.distancedata.entity.ContinentTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Country.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.entity</a> &gt; <span class="el_source">Country.java</span></div><h1>Country.java</h1><pre class="source lang-java linenums">package org.example.distancedata.entity;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = &quot;country&quot;)
+<span class="pc bnc" id="L12" title="All 46 branches missed.">@Data</span>
+<span class="pc" id="L13">@Builder</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+public class Country{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = &quot;id&quot;)
+<span class="fc" id="L19">    private Long id;</span>
+    @Column(name = &quot;name&quot;)
+<span class="fc" id="L21">    private String name;</span>
+    @Column(name = &quot;latitude&quot;)
+<span class="fc" id="L23">    private Double latitude;</span>
+    @Column(name = &quot;longitude&quot;)
+<span class="fc" id="L25">    private Double longitude;</span>
+
+<span class="fc" id="L27">    public Country(Long id, String name, Double latitude, Double longitude, Continent continent) {</span>
+<span class="fc" id="L28">        this.id = id;</span>
+<span class="fc" id="L29">        this.name = name;</span>
+<span class="fc" id="L30">        this.latitude = latitude;</span>
+<span class="fc" id="L31">        this.longitude = longitude;</span>
+<span class="fc" id="L32">        this.continent = continent;</span>
+<span class="fc" id="L33">    }</span>
+
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = &quot;continent&quot;)
+    @JsonBackReference
+<span class="fc" id="L39">    private Continent continent;</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

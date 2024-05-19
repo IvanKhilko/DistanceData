@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CountryController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.controllers</a> &gt; <span class="el_source">CountryController.java</span></div><h1>CountryController.java</h1><pre class="source lang-java linenums">package org.example.distancedata.controllers;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import org.example.distancedata.aspect.AspectAnnotation;
+import org.example.distancedata.dto.CountryDTO;
+import org.example.distancedata.entity.Country;
+import org.example.distancedata.exception.BadRequestException;
+import org.example.distancedata.exception.ResourceNotFoundException;
+import org.example.distancedata.services.DistanceService;
+import org.example.distancedata.services.implementation.CountryServiceImpl;
+import org.example.distancedata.services.implementation.ContinentServiceImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@Tag(name = &quot;CountryController&quot;)
+@RestController
+@RequestMapping(&quot;/api/countries&quot;)
+<span class="fc" id="L30">@AllArgsConstructor</span>
+public class CountryController {
+    private final CountryServiceImpl dataService;
+    private final DistanceService distanceService;
+    private final ContinentServiceImpl continentService;
+
+    @GetMapping(value = &quot;/all&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;List&lt;Country&gt;&gt; getAllCountry() {
+<span class="fc" id="L38">        return new ResponseEntity&lt;&gt;(dataService.read(), HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(value = &quot;/info&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;Country&gt; getCountryInfo(
+            final @RequestParam(name = &quot;country&quot;) String countryName)
+            throws ResourceNotFoundException {
+<span class="fc" id="L46">        var countryInfo = dataService.getByName(countryName);</span>
+<span class="fc" id="L47">        return new ResponseEntity&lt;&gt;(countryInfo, HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(value = &quot;/find&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;Country&gt; getCountryInfoById(
+            final @RequestParam(name = &quot;id&quot;) Long id)
+            throws ResourceNotFoundException {
+<span class="fc" id="L55">        var countryInfo = dataService.getByID(id);</span>
+<span class="fc" id="L56">        return new ResponseEntity&lt;&gt;(countryInfo, HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(value = &quot;/distance/{firstCountry}+{secondCountry}&quot;,
+            produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;HashMap&lt;String, String&gt;&gt; getDistance(
+            final @PathVariable(name = &quot;firstCountry&quot;) String firstCountry,
+            final @PathVariable(name = &quot;secondCountry&quot;) String secondCountry)
+            throws ResourceNotFoundException {
+<span class="fc" id="L66">        var firstCountryInfo = dataService.getByName(firstCountry);</span>
+<span class="fc" id="L67">        var secondCountryInfo = dataService.getByName(secondCountry);</span>
+<span class="fc" id="L68">        double distance = distanceService.getDistanceInKilometres(firstCountryInfo, secondCountryInfo);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (distance != -1) {</span>
+<span class="fc" id="L70">            var objects = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L71">            objects.put(&quot;First country info: &quot;, firstCountryInfo.getName() + &quot; &quot;</span>
+<span class="fc" id="L72">                    + firstCountryInfo.getLongitude() + &quot; &quot; + firstCountryInfo.getLatitude());</span>
+<span class="fc" id="L73">            objects.put(&quot;Second country info: &quot;, secondCountryInfo.getName() + &quot; &quot;</span>
+<span class="fc" id="L74">                    + secondCountryInfo.getLongitude() + &quot; &quot; + secondCountryInfo.getLatitude());</span>
+<span class="fc" id="L75">            objects.put(&quot;Distance&quot;, Double.toString(distance));</span>
+<span class="fc" id="L76">            return new ResponseEntity&lt;&gt;(objects, HttpStatus.OK);</span>
+        }
+<span class="fc" id="L78">        return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+    }
+
+    @AspectAnnotation
+    @PutMapping(&quot;/update&quot;)
+    public HttpStatus update(final @RequestBody CountryDTO country)
+            throws ResourceNotFoundException {
+<span class="fc" id="L85">        dataService.update(country);</span>
+<span class="fc" id="L86">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @PutMapping(&quot;/update/{continentName}&quot;)
+    public HttpStatus update(final @RequestBody CountryDTO country,
+                             final @PathVariable(name = &quot;continentName&quot;)
+                             String continentName)
+            throws ResourceNotFoundException {
+<span class="fc" id="L95">        var continent = continentService.getByName(continentName);</span>
+<span class="fc" id="L96">        dataService.updateWithContinent(country, continent);</span>
+<span class="fc" id="L97">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @PostMapping(&quot;/create/{continentName}&quot;)
+    public HttpStatus create(final @RequestBody CountryDTO country,
+                             final @PathVariable(name = &quot;continentName&quot;)
+                             String continentName)
+            throws ResourceNotFoundException, BadRequestException {
+<span class="fc" id="L106">        var continent = continentService.getByName(continentName);</span>
+<span class="fc" id="L107">        dataService.createWithContinent(country, continent);</span>
+<span class="fc" id="L108">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @DeleteMapping(&quot;/delete&quot;)
+    public HttpStatus delete(final @RequestParam(name = &quot;id&quot;) Long id)
+            throws ResourceNotFoundException {
+<span class="fc" id="L115">        dataService.delete(id);</span>
+<span class="fc" id="L116">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(&quot;/getBetweenLatitude&quot;)
+    public ResponseEntity&lt;List&lt;Country&gt;&gt; getCountriesBetween(
+            final @RequestParam(name = &quot;first&quot;) Double first,
+            final @RequestParam(name = &quot;second&quot;) Double second) {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (first &gt; second) {</span>
+<span class="fc" id="L125">            return new ResponseEntity&lt;&gt;(</span>
+<span class="fc" id="L126">                    dataService.getBetweenLatitudes(second, first),</span>
+                    HttpStatus.OK);
+        }
+<span class="fc" id="L129">        return new ResponseEntity&lt;&gt;(</span>
+<span class="fc" id="L130">                dataService.getBetweenLatitudes(first, second), HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @PostMapping(&quot;/bulkCreate&quot;)
+    public HttpStatus bulkCreate(
+            @RequestBody final List&lt;CountryDTO&gt; countryDTOS) {
+<span class="fc" id="L137">        dataService.createBulk(countryDTOS);</span>
+<span class="fc" id="L138">        return HttpStatus.OK;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ContinentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.controllers</a> &gt; <span class="el_source">ContinentController.java</span></div><h1>ContinentController.java</h1><pre class="source lang-java linenums">package org.example.distancedata.controllers;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import org.example.distancedata.aspect.AspectAnnotation;
+import org.example.distancedata.dto.ContinentDTO;
+import org.example.distancedata.entity.Continent;
+import org.example.distancedata.exception.BadRequestException;
+import org.example.distancedata.exception.ResourceNotFoundException;
+import org.example.distancedata.services.implementation.ContinentServiceImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@Tag(name = &quot;ContinentController&quot;)
+@RestController
+@RequestMapping(&quot;/api/continents&quot;)
+<span class="fc" id="L26">@AllArgsConstructor</span>
+public class ContinentController {
+    private final ContinentServiceImpl continentService;
+
+    @GetMapping(value = &quot;/all&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;List&lt;Continent&gt;&gt; getAll() {
+<span class="fc" id="L32">        return new ResponseEntity&lt;&gt;(continentService.read(), HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(value = &quot;/info&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;Continent&gt; getContinent(
+            final @RequestParam(name = &quot;continent&quot;) String name)
+            throws ResourceNotFoundException {
+<span class="fc" id="L40">        var continent = continentService.getByName(name);</span>
+<span class="fc" id="L41">        return new ResponseEntity&lt;&gt;(continent, HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(value = &quot;/find&quot;, produces = &quot;application/json&quot;)
+    public ResponseEntity&lt;Continent&gt; getContinentById(
+            final @RequestParam(name = &quot;id&quot;) Long id)
+            throws ResourceNotFoundException {
+<span class="fc" id="L49">        var continent = continentService.getByID(id);</span>
+<span class="fc" id="L50">        return new ResponseEntity&lt;&gt;(continent, HttpStatus.OK);</span>
+    }
+
+    @AspectAnnotation
+    @PutMapping(&quot;/update&quot;)
+    public HttpStatus update(final @RequestBody ContinentDTO continentDto)
+            throws ResourceNotFoundException {
+<span class="fc" id="L57">        continentService.update(continentDto);</span>
+<span class="fc" id="L58">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @PostMapping(&quot;/create&quot;)
+    public HttpStatus create(final @RequestBody ContinentDTO continentDto)
+            throws BadRequestException {
+<span class="fc" id="L65">        continentService.create(continentDto);</span>
+<span class="fc" id="L66">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @PostMapping(&quot;/bulkCreate&quot;)
+    public HttpStatus bulkCreate(
+            @RequestBody final List&lt;ContinentDTO&gt; continents) {
+<span class="fc" id="L73">        continentService.createBulk(continents);</span>
+<span class="fc" id="L74">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @DeleteMapping(&quot;/delete&quot;)
+    public HttpStatus delete(final @RequestParam(name = &quot;id&quot;) Long id)
+            throws ResourceNotFoundException {
+<span class="fc" id="L81">        continentService.delete(id);</span>
+<span class="fc" id="L82">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @PutMapping(&quot;/add_language&quot;)
+    public HttpStatus addLanguages(
+            final @RequestBody ContinentDTO continentDto)
+            throws ResourceNotFoundException {
+<span class="fc" id="L90">        continentService.modifyLanguage(continentDto, false);</span>
+<span class="fc" id="L91">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @PutMapping(&quot;/delete_language&quot;)
+    public HttpStatus deleteLanguages(
+            final @RequestBody ContinentDTO continentDto)
+            throws ResourceNotFoundException {
+<span class="fc" id="L99">        continentService.modifyLanguage(continentDto, true);</span>
+<span class="fc" id="L100">        return HttpStatus.OK;</span>
+    }
+
+    @AspectAnnotation
+    @GetMapping(&quot;/get_by_language&quot;)
+    public ResponseEntity&lt;List&lt;Continent&gt;&gt; getContinentsByLanguage(
+            final @RequestParam(name = &quot;id&quot;) Long id)
+            throws ResourceNotFoundException {
+<span class="fc" id="L108">        var continents = continentService.getByLanguage(id);</span>
+<span class="fc" id="L109">        return new ResponseEntity&lt;&gt;(continents, HttpStatus.OK);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

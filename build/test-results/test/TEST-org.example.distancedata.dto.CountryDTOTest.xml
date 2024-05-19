@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.dto.CountryDTOTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:56" hostname="IVANPC" time="0.129">
+  <properties/>
+  <testcase name="testGettersAndSetters()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.005"/>
+  <testcase name="testEquals2()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.002"/>
+  <testcase name="testEquals3()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.067"/>
+  <testcase name="testEquals4()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.002"/>
+  <testcase name="testEquals5()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.001"/>
+  <testcase name="testEquals6()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.002"/>
+  <testcase name="testEquals7()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.004"/>
+  <testcase name="testEquals8()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEquals9()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEqualsAndHashCode2()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.0"/>
+  <testcase name="testEqualsAndHashCode3()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEqualsAndHashCode4()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.005"/>
+  <testcase name="testEquals10()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEquals11()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEquals12()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.004"/>
+  <testcase name="testEquals13()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEquals14()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.003"/>
+  <testcase name="testEquals15()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.004"/>
+  <testcase name="testEquals()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.001"/>
+  <testcase name="testEqualsAndHashCode()" classname="org.example.distancedata.dto.CountryDTOTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

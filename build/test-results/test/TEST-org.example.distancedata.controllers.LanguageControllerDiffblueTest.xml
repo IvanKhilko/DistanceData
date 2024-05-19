@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.controllers.LanguageControllerDiffblueTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:53" hostname="IVANPC" time="0.081">
+  <properties/>
+  <testcase name="testBulkCreate()" classname="org.example.distancedata.controllers.LanguageControllerDiffblueTest" time="0.032"/>
+  <testcase name="testAddLanguage()" classname="org.example.distancedata.controllers.LanguageControllerDiffblueTest" time="0.026"/>
+  <testcase name="testUpdate()" classname="org.example.distancedata.controllers.LanguageControllerDiffblueTest" time="0.019"/>
+  <system-out><![CDATA[2024-04-23 13:28:53,965 ?[32mINFO ?[0;39m ?[36mo.s.mock.web.MockServletContext[Test worker]?[0;39m - Initializing Spring TestDispatcherServlet ''
+2024-04-23 13:28:53,966 ?[32mINFO ?[0;39m ?[36mo.s.t.w.s.TestDispatcherServlet[Test worker]?[0;39m - Initializing Servlet ''
+2024-04-23 13:28:53,966 ?[32mINFO ?[0;39m ?[36mo.s.t.w.s.TestDispatcherServlet[Test worker]?[0;39m - Completed initialization in 0 ms
+2024-04-23 13:28:53,991 ?[32mINFO ?[0;39m ?[36mo.s.mock.web.MockServletContext[Test worker]?[0;39m - Initializing Spring TestDispatcherServlet ''
+2024-04-23 13:28:53,991 ?[32mINFO ?[0;39m ?[36mo.s.t.w.s.TestDispatcherServlet[Test worker]?[0;39m - Initializing Servlet ''
+2024-04-23 13:28:53,992 ?[32mINFO ?[0;39m ?[36mo.s.t.w.s.TestDispatcherServlet[Test worker]?[0;39m - Completed initialization in 1 ms
+2024-04-23 13:28:54,018 ?[32mINFO ?[0;39m ?[36mo.s.mock.web.MockServletContext[Test worker]?[0;39m - Initializing Spring TestDispatcherServlet ''
+2024-04-23 13:28:54,019 ?[32mINFO ?[0;39m ?[36mo.s.t.w.s.TestDispatcherServlet[Test worker]?[0;39m - Initializing Servlet ''
+2024-04-23 13:28:54,019 ?[32mINFO ?[0;39m ?[36mo.s.t.w.s.TestDispatcherServlet[Test worker]?[0;39m - Completed initialization in 0 ms
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

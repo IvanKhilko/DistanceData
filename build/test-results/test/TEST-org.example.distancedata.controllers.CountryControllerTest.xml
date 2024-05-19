@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.controllers.CountryControllerTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:53" hostname="IVANPC" time="0.095">
+  <properties/>
+  <testcase name="shouldFindByInfo()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.005"/>
+  <testcase name="shouldFindById()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.003"/>
+  <testcase name="shouldUpdateWithContinent()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.005"/>
+  <testcase name="shouldCalculateDistance()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.005"/>
+  <testcase name="shouldUpdate()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <testcase name="bulkInsert()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <testcase name="shouldReturnOkAll()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <testcase name="shouldNotUpdateWithContinent()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.008"/>
+  <testcase name="shouldUpdateWithNotExistedContinent()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <testcase name="shouldNotCalculateDistance()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.005"/>
+  <testcase name="shouldNotFindById()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.003"/>
+  <testcase name="shouldNotAddCountry()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.005"/>
+  <testcase name="shouldNotUpdate()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <testcase name="shouldNotDeleteWithId()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <testcase name="shouldDeleteWithId()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.003"/>
+  <testcase name="shouldNotFindByInfo()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.003"/>
+  <testcase name="shouldAddCountry()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.005"/>
+  <testcase name="shouldNotAddCountryNotExistedCountry()" classname="org.example.distancedata.controllers.CountryControllerTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.service_implementation.LanguageServiceImplTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:57" hostname="IVANPC" time="0.265">
+  <properties/>
+  <testcase name="deleteLanguageInvalidId()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.196"/>
+  <testcase name="findLanguageByIdNotExist()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.005"/>
+  <testcase name="deleteLanguageValidId()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <testcase name="bulkInsert()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.012"/>
+  <testcase name="findLanguageByIdNotInCache()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="findLanguageByIdInCache()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="findLanguageByNameNotInCache()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="updateLanguageByDtoWithNotExistedId()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="updateLanguageByDto()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.004"/>
+  <testcase name="shouldConsiderUsedIndexes()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="createLanguageByDtoSuccessful()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <testcase name="createLanguageByDtoExistedId()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <testcase name="createLanguageSuccessful()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="shouldReturnAllLanguage()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="shouldFindNextAvailableIdWhenThereAreGaps()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.002"/>
+  <testcase name="updateLanguageByNotExistedEntity()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <testcase name="updateLanguageByEntity()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <testcase name="shouldFindNextAvailableIdWhenAllIdsUsed()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <testcase name="findLanguageByNameNotExist()" classname="org.example.distancedata.service_implementation.LanguageServiceImplTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Список континентов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        td:first-child {
+            width: 20%;
+        }
+
+        td:last-child {
+            width: 80%;
+        }
+
+        .link-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .link-container a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .link-container a:hover {
+            background-color: #2980b9;
+        }
+
+        /* Стили для кнопок Удалить и Обновить */
+        .delete-button, .update-button {
+            padding: 8px 15px;
+            color: white; /* Цвет текста */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-button {
+            background-color: #e74c3c; /* Цвет фона */
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b; /* Цвет фона при наведении */
+        }
+
+        .update-button {
+            background-color: #f39c12; /* Цвет фона */
+        }
+
+        .update-button:hover {
+            background-color: #e67e22; /* Цвет фона при наведении */
+        }
+
+        /* Стили для текстового поля */
+        .update-input {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-left: 10px;
+            width: 60%;
+        }
+    </style>
+</head>
+<body>
+<h1>Список континентов</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Действия</th>
+    </tr>
+    <tr th:each="continent : ${continents}">
+        <td th:text="${continent.id}"></td>
+        <td th:text="${continent.name}"></td>
+        <td>
+            <form th:action="@{'/delete/' + ${continent.id}}" method="post" style="display:inline;">
+                <button type="submit" class="delete-button">Удалить</button>
+            </form>
+            <form th:action="@{'/update/' + ${continent.id}  + '/' + newName}" method="post" style="display:inline;">
+                <button type="submit" class="update-button">Обновить</button>
+                <input type="text" class="update-input" id="update-name-[[${continent.id}]]" name="newName" placeholder="Новое название" th:value="${continentDTOJson}">
+            </form>
+        </td>
+    </tr>
+</table>
+<div class="link-container">
+    <a th:href="@{/}">Вернуться в главное меню</a>
+</div>
+
+<!-- JavaScript для удаления и обновления континента -->
+<script type="text/javascript">
+    // Функция для удаления континента
+    function deleteContinent(continentId) {
+        fetch('http://localhost:8080/delete/' + continentId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления континента');
+                }
+                location.reload(); // Перезагрузить страницу после успешного удаления
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+    }
+
+    // Функция для обновления континента
+    // Функция для обновления континента
+    function updateContinent(continentId) {
+        // Получение нового имени континента из поля ввода
+        const newName = document.getElementById('update-name-' + continentId).value;
+
+        // Отправка POST-запроса на сервер
+        fetch('http://localhost:8080/update/' + continentId + '/' + encodeURIComponent(newName), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // В теле запроса отправляем только заголовок и необходимо включить body
+            body: JSON.stringify({ continentDTOJson: newName })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка обновления континента');
+                }
+                location.reload(); // Перезагрузить страницу после успешного обновления
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+    }
+
+</script>
+</body>
+</html>

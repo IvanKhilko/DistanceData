@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:57" hostname="IVANPC" time="0.149">
+  <properties/>
+  <testcase name="testUpdateWithContinent2()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdateWithContinent3()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.07"/>
+  <testcase name="testUpdateWithContinent()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreateBulk2()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.004"/>
+  <testcase name="testCreateBulk3()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreateBulk4()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testCreateBulk5()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testFindFreeId()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testUpdate2()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testUpdate3()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.004"/>
+  <testcase name="testUpdate4()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate5()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate6()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.005"/>
+  <testcase name="testFindFreeId2()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testFindFreeId3()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testFindFreeId4()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testFindFreeId5()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testGetBetweenLatitudes2()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testGetBetweenLatitudes()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testCreateBulk()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.001"/>
+  <testcase name="testUpdate()" classname="org.example.distancedata.services.implementation.CountryServiceImplDiffblueTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

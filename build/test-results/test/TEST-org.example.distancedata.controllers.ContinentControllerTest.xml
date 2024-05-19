@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.controllers.ContinentControllerTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:52" hostname="IVANPC" time="0.474">
+  <properties/>
+  <testcase name="shouldReturnAllContinents()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.352"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenDeletingNonexistentContinent()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.02"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenContinentByNameNotFound()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.006"/>
+  <testcase name="shouldDeleteContinentById()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.006"/>
+  <testcase name="shouldAddLanguages()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.006"/>
+  <testcase name="shouldFindContinentById()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldFindContinentByName()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldUpdateContinent()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenUpdatingNonexistentContinent()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.005"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenDeletingLanguagesFromNonexistentContinent()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldBulkCreateContinents()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.003"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenLanguageNotFound()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldDeleteLanguages()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldCreateContinent()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.003"/>
+  <testcase name="shouldGetContinentsByLanguage()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.004"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenContinentByIdNotFound()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.005"/>
+  <testcase name="shouldThrowBadRequestExceptionWhenContinentCreationFails()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.005"/>
+  <testcase name="shouldThrowResourceNotFoundExceptionWhenAddingLanguagesToNonexistentContinent()" classname="org.example.distancedata.controllers.ContinentControllerTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LanguageServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.services.implementation</a> &gt; <span class="el_source">LanguageServiceImpl.java</span></div><h1>LanguageServiceImpl.java</h1><pre class="source lang-java linenums">package org.example.distancedata.services.implementation;
+
+import jakarta.transaction.Transactional;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import org.example.distancedata.cache.LRUCache;
+import org.example.distancedata.dto.LanguageDTO;
+import org.example.distancedata.entity.Continent;
+import org.example.distancedata.entity.Language;
+import org.example.distancedata.exception.BadRequestException;
+import org.example.distancedata.exception.ResourceNotFoundException;
+import org.example.distancedata.repository.LanguageRepository;
+import org.example.distancedata.services.DataService;
+import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+
+@Service
+<span class="fc" id="L25">@AllArgsConstructor</span>
+public class LanguageServiceImpl implements DataService&lt;Language, LanguageDTO&gt; {
+    private final LanguageRepository repository;
+    private final LRUCache&lt;Long, Language&gt; cache;
+    private final JdbcTemplate jdbcTemplate;
+    private static final String DONT_EXIST = &quot; doesn't exist&quot;;
+
+    @Override
+    public Language create(final Language language) {
+<span class="fc" id="L34">        repository.save(language);</span>
+<span class="fc" id="L35">        cache.put(language.getId(), language);</span>
+<span class="fc" id="L36">        return language;</span>
+    }
+
+
+    @Override
+    public List&lt;Language&gt; read() {
+<span class="fc" id="L42">        return repository.findAll(Sort.by(&quot;id&quot;));</span>
+    }
+
+    @Override
+    public Language getByName(final String name)
+            throws ResourceNotFoundException {
+<span class="fc" id="L48">        var optionalLanguage = repository.getByName(name);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (optionalLanguage.isPresent()) {</span>
+<span class="fc" id="L50">            cache.put(optionalLanguage.get().getId(), optionalLanguage.get());</span>
+        } else {
+<span class="fc" id="L52">            throw new ResourceNotFoundException(</span>
+                    &quot;Can't find language because with this name&quot;);
+        }
+<span class="fc" id="L55">        return optionalLanguage.get();</span>
+    }
+
+    @Override
+    public Language getByID(final Long id) throws ResourceNotFoundException {
+<span class="fc" id="L60">        var optionalLanguage = cache.get(id);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (optionalLanguage.isEmpty()) {</span>
+<span class="fc" id="L62">            optionalLanguage = repository.getLanguageById(id);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (optionalLanguage.isPresent()) {</span>
+<span class="fc" id="L64">                cache.put(id, optionalLanguage.get());</span>
+            } else {
+<span class="fc" id="L66">                throw new ResourceNotFoundException(</span>
+                        &quot;Can't find language with this id = &quot;
+                                + id + &quot; doesnt exist&quot;);
+            }
+        }
+<span class="fc" id="L71">        return optionalLanguage.get();</span>
+    }
+
+    @Override
+    public void update(final Language language) throws ResourceNotFoundException {
+        try {
+<span class="fc" id="L77">            getByID(language.getId());</span>
+<span class="fc" id="L78">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L79">            throw new ResourceNotFoundException(&quot;No info with this id&quot;);</span>
+<span class="fc" id="L80">        }</span>
+<span class="fc" id="L81">        cache.remove(language.getId());</span>
+<span class="fc" id="L82">        repository.save(language);</span>
+<span class="fc" id="L83">        cache.put(language.getId(), language);</span>
+<span class="fc" id="L84">    }</span>
+
+    @Override
+    public void delete(final Long id) throws ResourceNotFoundException {
+<span class="fc" id="L88">        Language language = getByID(id);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (language != null) {</span>
+<span class="fc" id="L90">            List&lt;Continent&gt; existingContinents = language.getContinents();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">            for (Continent continent : existingContinents) {</span>
+<span class="fc" id="L92">                continent.removeLanguage(language);</span>
+<span class="fc" id="L93">            }</span>
+<span class="fc" id="L94">            cache.remove(id);</span>
+<span class="fc" id="L95">            repository.deleteById(language.getId());</span>
+<span class="fc" id="L96">        } else {</span>
+<span class="nc" id="L97">            throw new ResourceNotFoundException(</span>
+                    &quot;Can't delete language with this id = &quot;
+                            + id + DONT_EXIST);
+        }
+<span class="fc" id="L101">    }</span>
+
+    @Transactional
+    @Override
+    public void createBulk(final List&lt;LanguageDTO&gt; list)
+            throws BadRequestException {
+<span class="fc" id="L107">        List&lt;Language&gt; languages = list.stream()</span>
+<span class="fc" id="L108">                .map(languageDTO -&gt; Language.builder()</span>
+<span class="fc" id="L109">                        .name(languageDTO.getName()).build()).toList();</span>
+<span class="fc" id="L110">        String sql = &quot;INSERT into language (name, id) VALUES (?, ?)&quot;;</span>
+<span class="fc" id="L111">        var indexes = new HashSet&lt;Long&gt;();</span>
+<span class="fc" id="L112">        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {</span>
+            @Override
+            public void setValues(final PreparedStatement statement,
+                                  final int i)
+                    throws SQLException {
+<span class="nc" id="L117">                long index = findFreeId(indexes);</span>
+<span class="nc" id="L118">                indexes.add(index);</span>
+<span class="nc" id="L119">                statement.setString(1, languages.get(i).getName());</span>
+<span class="nc" id="L120">                statement.setLong(2, index);</span>
+<span class="nc" id="L121">            }</span>
+
+            @Override
+            public int getBatchSize() {
+<span class="nc" id="L125">                return languages.size();</span>
+            }
+        });
+<span class="fc" id="L128">    }</span>
+
+    @SuppressWarnings(&quot;checkstyle:OverloadMethodsDeclarationOrder&quot;)
+    public void update(final LanguageDTO language)
+            throws ResourceNotFoundException {
+<span class="fc" id="L133">        update(Language.builder().name(language.getName())</span>
+<span class="fc" id="L134">                .continents(new ArrayList&lt;&gt;()).id(language.getId()).build());</span>
+<span class="fc" id="L135">    }</span>
+
+    @SuppressWarnings(&quot;checkstyle:OverloadMethodsDeclarationOrder&quot;)
+    public void create(final LanguageDTO language) throws BadRequestException {
+        try {
+<span class="fc" id="L140">            getByName(language.getName());</span>
+<span class="fc" id="L141">            throw new BadRequestException(&quot;Language with this id is existed&quot;);</span>
+<span class="fc" id="L142">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L143">            var newLanguage = Language.builder().name(language.getName())</span>
+<span class="fc" id="L144">                    .id(findFreeId()).continents(new ArrayList&lt;&gt;()).build();</span>
+<span class="fc" id="L145">            create(newLanguage);</span>
+        }
+<span class="fc" id="L147">    }</span>
+
+    private long findFreeId() {
+<span class="fc" id="L150">        var list = read();</span>
+<span class="fc" id="L151">        long i = 1;</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        for (Language language : list) {</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            if (language.getId() != i) {</span>
+<span class="nc" id="L154">                return i;</span>
+            }
+<span class="nc" id="L156">            i++;</span>
+<span class="nc" id="L157">        }</span>
+<span class="fc" id="L158">        return i + 1;</span>
+    }
+
+    public long findFreeId(final HashSet&lt;Long&gt; usedIndexes) {
+        // РЎРѕР±РёСЂР°РµРј РІСЃРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ РёР· Р±Р°Р·С‹ РґР°РЅРЅС‹С…
+<span class="fc" id="L163">        var existingIds = new HashSet&lt;Long&gt;();</span>
+<span class="fc" id="L164">        var languages = read(); // РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ read() РІРѕР·РІСЂР°С‰Р°РµС‚ РІСЃРµ СЏР·С‹РєРё</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        for (Language language : languages) {</span>
+<span class="fc" id="L166">            existingIds.add(language.getId());</span>
+<span class="fc" id="L167">        }</span>
+
+        // Р”РѕР±Р°РІР»СЏРµРј СѓР¶Рµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРЅС‹Рµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹
+<span class="fc" id="L170">        existingIds.addAll(usedIndexes);</span>
+
+        // РќР°С…РѕРґРёРј СЃР»РµРґСѓСЋС‰РёР№ СЃРІРѕР±РѕРґРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ, РЅР°С‡РёРЅР°СЏ СЃ 1
+<span class="fc" id="L173">        long id = 1;</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        while (existingIds.contains(id)) {</span>
+<span class="fc" id="L175">            id++;</span>
+        }
+
+<span class="fc" id="L178">        return id; // Р’РѕР·РІСЂР°С‰Р°РµРј РїРµСЂРІС‹Р№ СЃРІРѕР±РѕРґРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

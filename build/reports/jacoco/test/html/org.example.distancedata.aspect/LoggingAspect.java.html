@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoggingAspect.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.aspect</a> &gt; <span class="el_source">LoggingAspect.java</span></div><h1>LoggingAspect.java</h1><pre class="source lang-java linenums">package org.example.distancedata.aspect;
+
+import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+
+@Aspect
+<span class="fc" id="L11">@Slf4j</span>
+@Component
+<span class="fc" id="L13">public class LoggingAspect {</span>
+    @Pointcut(&quot;within(org.example.distancedata.controllers..*)&quot;
+            + &quot; || within(org.example.distancedata.services..*)&quot;
+            + &quot; || within(org.example.distancedata.cache..*)&quot;)
+    public void allMethods() {
+
+<span class="nc" id="L19">    }</span>
+
+
+    @Pointcut(&quot;@annotation(AspectAnnotation)&quot;)
+    public void methodsWithAnnotation() {
+
+<span class="nc" id="L25">    }</span>
+
+    @Around(value = &quot;methodsWithAnnotation()&quot;)
+    public Object loggingMethods(final ProceedingJoinPoint point)
+            throws Throwable {
+<span class="fc" id="L30">        log.info(&quot;Enter method {}.{} with argument(s): {}&quot;,</span>
+<span class="fc" id="L31">                point.getSignature().getDeclaringTypeName(),</span>
+<span class="fc" id="L32">                point.getSignature().getName(),</span>
+<span class="fc" id="L33">                Arrays.toString(point.getArgs()));</span>
+        try {
+<span class="fc" id="L35">            Object result = point.proceed();</span>
+<span class="fc" id="L36">            log.info(&quot;After execution method {}.{} with argument(s): {}&quot;,</span>
+<span class="fc" id="L37">                    point.getSignature().getDeclaringTypeName(),</span>
+<span class="fc" id="L38">                    point.getSignature().getName(),</span>
+<span class="fc" id="L39">                    Arrays.toString(point.getArgs()));</span>
+<span class="fc" id="L40">            return result;</span>
+<span class="fc" id="L41">        } catch (Throwable e) {</span>
+<span class="fc" id="L42">            log.error(&quot;Illegal argument(s) {} in method {}.{}()&quot;,</span>
+<span class="fc" id="L43">                    Arrays.toString(point.getArgs()),</span>
+<span class="fc" id="L44">                    point.getSignature().getDeclaringTypeName(),</span>
+<span class="fc" id="L45">                    point.getSignature().getName());</span>
+<span class="fc" id="L46">            throw e;</span>
+        }
+    }
+    @AfterThrowing(pointcut = &quot;allMethods()&quot;, throwing = &quot;exception&quot;)
+    public void logsExceptionsFromAnyLocation(final JoinPoint joinPoint,
+                                              final Throwable exception) {
+<span class="fc" id="L52">        log.error(&quot;Exception in {}.{}() - {}&quot;,</span>
+<span class="fc" id="L53">                joinPoint.getSignature().getDeclaringTypeName(),</span>
+<span class="fc" id="L54">                joinPoint.getSignature().getName(), exception.getMessage());</span>
+<span class="fc" id="L55">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

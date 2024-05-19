@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.service_implementation.DistanceServiceImplTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:57" hostname="IVANPC" time="0.014">
+  <properties/>
+  <testcase name="shouldCalculateDistanceForCountriesAtEquator()" classname="org.example.distancedata.service_implementation.DistanceServiceImplTest" time="0.005"/>
+  <testcase name="shouldCalculateDistanceForCountriesInDifferentHemisphere()" classname="org.example.distancedata.service_implementation.DistanceServiceImplTest" time="0.002"/>
+  <testcase name="shouldReturnNegativeOneForNullCountries()" classname="org.example.distancedata.service_implementation.DistanceServiceImplTest" time="0.001"/>
+  <testcase name="shouldReturnZeroForIdenticalCountries()" classname="org.example.distancedata.service_implementation.DistanceServiceImplTest" time="0.001"/>
+  <testcase name="shouldCalculateDistanceForCloseCountries()" classname="org.example.distancedata.service_implementation.DistanceServiceImplTest" time="0.002"/>
+  <testcase name="shouldCalculateDistanceForDifferentCountries()" classname="org.example.distancedata.service_implementation.DistanceServiceImplTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Language.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.entity</a> &gt; <span class="el_source">Language.java</span></div><h1>Language.java</h1><pre class="source lang-java linenums">package org.example.distancedata.entity;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Entity
+<span class="pc bpc" id="L15" title="21 of 30 branches missed.">@Data</span>
+<span class="pc" id="L16">@Builder</span>
+<span class="fc" id="L17">@AllArgsConstructor</span>
+<span class="fc" id="L18">@NoArgsConstructor</span>
+@Table(name = &quot;language&quot;)
+public class Language {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = &quot;id&quot;)
+<span class="fc" id="L24">    private Long id;</span>
+    @Column(name = &quot;name&quot;)
+<span class="fc" id="L26">    private String name;</span>
+
+<span class="fc" id="L28">    public Language(Long id, String name) {</span>
+<span class="fc" id="L29">        this.id = id;</span>
+<span class="fc" id="L30">        this.name = name;</span>
+<span class="fc" id="L31">    }</span>
+
+<span class="fc" id="L33">    @ManyToMany(mappedBy = &quot;languages&quot;,</span>
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            fetch = FetchType.LAZY)
+    @JsonBackReference
+<span class="fc" id="L37">    private List&lt;Continent&gt; continents = new ArrayList&lt;&gt;();</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

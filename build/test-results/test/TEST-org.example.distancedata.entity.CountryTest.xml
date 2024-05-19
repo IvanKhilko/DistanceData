@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.entity.CountryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:56" hostname="IVANPC" time="0.005">
+  <properties/>
+  <testcase name="testCountryProperties()" classname="org.example.distancedata.entity.CountryTest" time="0.0"/>
+  <testcase name="testAddCountryToContinent()" classname="org.example.distancedata.entity.CountryTest" time="0.001"/>
+  <testcase name="testCountryWithContinent()" classname="org.example.distancedata.entity.CountryTest" time="0.0"/>
+  <testcase name="testCountryConstructorWithArguments()" classname="org.example.distancedata.entity.CountryTest" time="0.0"/>
+  <testcase name="testCountrySettersAndGetters()" classname="org.example.distancedata.entity.CountryTest" time="0.001"/>
+  <testcase name="testCountryDefaultConstructor()" classname="org.example.distancedata.entity.CountryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

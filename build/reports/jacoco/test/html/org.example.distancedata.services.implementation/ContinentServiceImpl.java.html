@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ContinentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.services.implementation</a> &gt; <span class="el_source">ContinentServiceImpl.java</span></div><h1>ContinentServiceImpl.java</h1><pre class="source lang-java linenums">package org.example.distancedata.services.implementation;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import org.example.distancedata.cache.LRUCache;
+import org.example.distancedata.dto.ContinentDTO;
+import org.example.distancedata.entity.Continent;
+import org.example.distancedata.entity.Language;
+import org.example.distancedata.exception.BadRequestException;
+import org.example.distancedata.exception.ResourceNotFoundException;
+import org.example.distancedata.repository.ContinentRepository;
+import org.example.distancedata.repository.LanguageRepository;
+import org.example.distancedata.services.DataService;
+import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+<span class="fc" id="L23">@AllArgsConstructor</span>
+public class ContinentServiceImpl implements DataService&lt;Continent, ContinentDTO&gt; {
+    private final ContinentRepository continentRepository;
+    private final LanguageRepository languageRepository;
+    private final LRUCache&lt;Long, Continent&gt; cache;
+    private final JdbcTemplate jdbcTemplate;
+    private static final String DONT_EXIST = &quot; doesn't exist&quot;;
+
+    private long findFreeID() {
+<span class="fc" id="L32">        var list = read();</span>
+<span class="fc" id="L33">        long i = 1;</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        for (Continent continent : list) {</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">            if (continent.getId() != i) {</span>
+<span class="nc" id="L36">                return i;</span>
+            }
+<span class="nc" id="L38">            i++;</span>
+<span class="nc" id="L39">        }</span>
+<span class="fc" id="L40">        return i + 1;</span>
+    }
+
+
+    @Override
+    public Continent create(final Continent continent) {
+<span class="fc" id="L46">        cache.put(continent.getId(), continent);</span>
+<span class="fc" id="L47">        continentRepository.save(continent);</span>
+<span class="fc" id="L48">        return continent;</span>
+    }
+
+    @Override
+    public List&lt;Continent&gt; read() {
+<span class="fc" id="L53">        return continentRepository.findAll(Sort.by(&quot;id&quot;));</span>
+    }
+
+    @Override
+    public Continent getByName(final String name)
+            throws ResourceNotFoundException {
+<span class="fc" id="L59">        var optionalContinent = continentRepository.getByName(name);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (optionalContinent.isPresent()) {</span>
+<span class="fc" id="L61">            cache.put(optionalContinent.get().getId(), optionalContinent.get());</span>
+        } else {
+<span class="fc" id="L63">            throw new ResourceNotFoundException(</span>
+                    &quot;Can't find continent because with this name doesn't exist&quot;);
+        }
+<span class="fc" id="L66">        return optionalContinent.get();</span>
+    }
+
+
+    @Override
+    public Continent getByID(final Long id) throws ResourceNotFoundException {
+<span class="fc" id="L72">        var optionalContinent = cache.get(id);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (optionalContinent.isEmpty()) {</span>
+<span class="fc" id="L74">            optionalContinent = continentRepository.getContinentById(id);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (optionalContinent.isPresent()) {</span>
+<span class="fc" id="L76">                cache.put(id, optionalContinent.get());</span>
+            } else {
+<span class="fc" id="L78">                throw new ResourceNotFoundException(</span>
+                        &quot;Can't create continent with id = &quot;
+                                + id + &quot; already exist&quot;);
+            }
+        }
+<span class="fc" id="L83">        return optionalContinent.get();</span>
+    }
+
+    @Override
+    public void update(final Continent continent) {
+<span class="fc" id="L88">        cache.remove(continent.getId());</span>
+<span class="fc" id="L89">        continentRepository.save(continent);</span>
+<span class="fc" id="L90">    }</span>
+
+    @Override
+    public void delete(final Long id)
+            throws ResourceNotFoundException {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (getByID(id) != null) {</span>
+<span class="fc" id="L96">            continentRepository.deleteById(id);</span>
+<span class="fc" id="L97">            cache.remove(id);</span>
+        } else {
+<span class="nc" id="L99">            throw new ResourceNotFoundException(</span>
+                    &quot;Can't delete continent with id = &quot; + id + DONT_EXIST);
+        }
+<span class="fc" id="L102">    }</span>
+
+    @Override
+    public void createBulk(final List&lt;ContinentDTO&gt; list)
+            throws BadRequestException {
+<span class="fc" id="L107">        List&lt;Continent&gt; continents = list.stream()</span>
+<span class="fc" id="L108">                .map(continentDTO -&gt; Continent.builder()</span>
+<span class="fc" id="L109">                        .name(continentDTO.getName())</span>
+<span class="fc" id="L110">                        .build())</span>
+<span class="fc" id="L111">                .toList();</span>
+<span class="fc" id="L112">        String sql = &quot;INSERT into continent (name) VALUES (?)&quot;;</span>
+
+<span class="fc" id="L114">        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {</span>
+            @Override
+            public void setValues(final PreparedStatement statement,
+                                  final int i) throws SQLException {
+<span class="nc" id="L118">                statement.setString(1, continents.get(i).getName());</span>
+<span class="nc" id="L119">            }</span>
+
+            @Override
+            public int getBatchSize() {
+<span class="nc" id="L123">                return continents.size();</span>
+            }
+        });
+<span class="fc" id="L126">    }</span>
+
+
+    @SuppressWarnings(&quot;checkstyle:OverloadMethodsDeclarationOrder&quot;)
+    public void create(final ContinentDTO continentDto) throws BadRequestException {
+        try {
+<span class="fc" id="L132">            getByName(continentDto.getName());</span>
+<span class="fc" id="L133">            cache.remove(continentDto.getId());</span>
+<span class="fc" id="L134">            throw new BadRequestException(&quot;Continent with this name is existed&quot;);</span>
+<span class="fc" id="L135">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L136">            var listLanguage = new HashSet&lt;Language&gt;();</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">            for (String ptrLanguage : continentDto.getLanguages()) {</span>
+<span class="nc" id="L138">                var language = languageRepository.getByName(ptrLanguage);</span>
+<span class="nc" id="L139">                language.ifPresent(listLanguage::add);</span>
+<span class="nc" id="L140">            }</span>
+<span class="fc" id="L141">            var newContinent = Continent.builder().name(continentDto.getName())</span>
+<span class="fc" id="L142">                    .languages(new HashSet&lt;&gt;()).id(findFreeID()).build();</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            for (Language language : listLanguage) {</span>
+<span class="nc" id="L144">                newContinent.addLanguage(language);</span>
+<span class="nc" id="L145">            }</span>
+<span class="fc" id="L146">            create(newContinent);</span>
+        }
+<span class="fc" id="L148">    }</span>
+
+    @SuppressWarnings(&quot;checkstyle:MissingJavadocMethod&quot;)
+    public void update(final ContinentDTO continent)
+            throws ResourceNotFoundException {
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (continentRepository.getContinentById(continent.getId()).isEmpty()) {</span>
+<span class="fc" id="L154">            throw new ResourceNotFoundException(</span>
+                    &quot;Continent with this id doesn't exist&quot;);
+        }
+<span class="fc" id="L157">        var newLanguages = new HashSet&lt;Language&gt;();</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        for (String language : continent.getLanguages()) {</span>
+<span class="fc" id="L159">            var languageTemp = languageRepository.getByName(language);</span>
+<span class="fc" id="L160">            languageTemp.ifPresent(newLanguages::add);</span>
+<span class="fc" id="L161">        }</span>
+<span class="fc" id="L162">        var updatedContinent = Continent.builder().name(continent.getName())</span>
+<span class="fc" id="L163">                .languages(new HashSet&lt;&gt;()).id(continent.getId()).build();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for (Language language : newLanguages) {</span>
+<span class="fc" id="L165">            updatedContinent.addLanguage(language);</span>
+<span class="fc" id="L166">        }</span>
+<span class="fc" id="L167">        update(updatedContinent);</span>
+<span class="fc" id="L168">    }</span>
+
+
+    @SuppressWarnings(&quot;checkstyle:MissingJavadocMethod&quot;)
+    public void modifyLanguage(final ContinentDTO continentDto,
+                               final boolean deleteFlag)
+            throws ResourceNotFoundException {
+        try {
+<span class="fc" id="L176">            var continent = getByID(continentDto.getId());</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">            for (String language : continentDto.getLanguages()) {</span>
+<span class="fc" id="L178">                var tempLanguage = languageRepository.getByName(language);</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">                tempLanguage.ifPresent(!deleteFlag</span>
+<span class="fc" id="L180">                        ? continent::addLanguage : continent::removeLanguage);</span>
+<span class="fc" id="L181">            }</span>
+<span class="fc" id="L182">            cache.remove(continent.getId());</span>
+<span class="fc" id="L183">            continentRepository.save(continent);</span>
+<span class="fc" id="L184">        } catch (ResourceNotFoundException e) {</span>
+<span class="fc" id="L185">            throw new ResourceNotFoundException(&quot;Cant modify language&quot;);</span>
+<span class="fc" id="L186">        }</span>
+<span class="fc" id="L187">    }</span>
+
+    public List&lt;Continent&gt; getByLanguage(final Long id)
+            throws ResourceNotFoundException {
+<span class="fc" id="L191">        var optionalLanguage = languageRepository.getLanguageById(id);</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (optionalLanguage.isEmpty()) {</span>
+<span class="fc" id="L193">            throw new ResourceNotFoundException(&quot;No language with this name&quot;);</span>
+        }
+<span class="fc" id="L195">        return continentRepository.findAllContinentWithLanguage(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" tests="36" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:57" hostname="IVANPC" time="0.214">
+  <properties/>
+  <testcase name="testGetByLanguage()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testRead2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreateBulk2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreateBulk3()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testCreateBulk4()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testRead()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testGetByLanguage2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testGetByLanguage3()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate3()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testUpdate4()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate5()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testUpdate6()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate7()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate8()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testUpdate9()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testModifyLanguage2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testModifyLanguage3()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.062"/>
+  <testcase name="testModifyLanguage4()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.004"/>
+  <testcase name="testModifyLanguage5()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.005"/>
+  <testcase name="testModifyLanguage6()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.004"/>
+  <testcase name="testCreate2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreate3()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.005"/>
+  <testcase name="testCreate4()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreate5()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testCreate6()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreate7()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreateBulk()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete2()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete3()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete4()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testCreate()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testModifyLanguage()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testUpdate10()" classname="org.example.distancedata.services.implementation.ContinentServiceImplDiffblueTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

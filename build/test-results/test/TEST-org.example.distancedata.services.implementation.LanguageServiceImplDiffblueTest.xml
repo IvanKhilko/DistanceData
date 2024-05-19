@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2024-04-23T10:28:57" hostname="IVANPC" time="0.09">
+  <properties/>
+  <testcase name="testFindFreeId()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testFindFreeId2()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.001"/>
+  <testcase name="testFindFreeId3()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testFindFreeId4()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testFindFreeId5()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testFindFreeId6()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.057"/>
+  <testcase name="testDelete2()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.002"/>
+  <testcase name="testDelete3()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete4()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete5()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.003"/>
+  <testcase name="testDelete()" classname="org.example.distancedata.services.implementation.LanguageServiceImplDiffblueTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

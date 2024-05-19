@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LRUCache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">DistanceData</a> &gt; <a href="index.source.html" class="el_package">org.example.distancedata.cache</a> &gt; <span class="el_source">LRUCache.java</span></div><h1>LRUCache.java</h1><pre class="source lang-java linenums">package org.example.distancedata.cache;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import lombok.Getter;
+
+
+public class LRUCache&lt;K, V&gt; implements Cache&lt;K, V&gt; {
+<span class="nc" id="L11">    @Getter</span>
+    private HashMap&lt;K, V&gt; hashMap;
+<span class="nc" id="L13">    @Getter</span>
+    private static final int MAXSIZE = 10;
+
+<span class="fc" id="L16">    public LRUCache() {</span>
+<span class="fc" id="L17">        hashMap = new LinkedHashMap&lt;&gt;(MAXSIZE * 2, 0.75f, true) {</span>
+            @Override
+            protected boolean removeEldestEntry(final Map.Entry&lt;K, V&gt; eldest) {
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">                return size() &gt; MAXSIZE;</span>
+            }
+        };
+<span class="fc" id="L23">    }</span>
+
+    @Override
+    public Optional&lt;V&gt; get(final K key) {
+<span class="fc" id="L27">        Optional&lt;V&gt; result = Optional.empty();</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (containsKey(key)) {</span>
+<span class="fc" id="L29">            result = Optional.of(hashMap.get(key));</span>
+        }
+<span class="fc" id="L31">        return result;</span>
+    }
+
+    @Override
+    public int size() {
+<span class="nc" id="L36">        return hashMap.size();</span>
+    }
+
+    @Override
+    public void put(final K key, final V value) {
+<span class="fc" id="L41">        hashMap.put(key, value);</span>
+<span class="fc" id="L42">    }</span>
+
+    @Override
+    public boolean containsKey(final K key) {
+<span class="fc" id="L46">        return hashMap.containsKey(key);</span>
+    }
+
+    @Override
+    public void remove(final K key) {
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (containsKey(key)) {</span>
+<span class="fc" id="L52">            hashMap.remove(key);</span>
+        }
+<span class="fc" id="L54">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
