@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Data
 @Table(name = "continent")
@@ -21,6 +20,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Continent {
+    public Continent(Long id, String name, List<Country> countries) {
+        this.id = id;
+        this.name = name;
+        this.countries = countries;
+    }
+
+    public Continent(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +50,12 @@ public class Continent {
             inverseJoinColumns = {@JoinColumn(name = "id_language")})
     @JsonManagedReference
     private Set<Language> languages = new HashSet<>();
+
+
+        public Continent(String name) {
+            this.name = name;
+        }
+
 
     public void addLanguage(final Language language) {
         languages.add(language);

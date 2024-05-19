@@ -7,6 +7,13 @@ plugins {
     id "jacoco"
     id "org.sonarqube" version "3.5.0.2730"
 }
+jacoco {
+    toolVersion = '0.8.8' // Укажите актуальную версию JaCoCo
+}
+
+test {
+    finalizedBy jacocoTestReport // Генерация отчета после тестирования
+}
 jacocoTestReport {
     reports {
         xml.required = true
@@ -14,10 +21,10 @@ jacocoTestReport {
 }
 sonar {
     properties {
-        property "sonar.projectKey", "maxiparshu_LabsJava4sem"
-        property "sonar.organization", "maxiparshu"
+        property "sonar.projectKey", "IvanKhilko_DistanceData"
+        property "sonar.organization", "IvanKhilko"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.token", "5002e7713654539264622a7842b98e3bcd453eff"
+        property "sonar.token", "210bf907a5c3d3a8cc2d3f405277ac3234c35940"
     }
 }
 group = 'org.example'
@@ -39,6 +46,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

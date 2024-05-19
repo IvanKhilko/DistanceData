@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Data
 @Builder
@@ -24,6 +23,11 @@ public class Language {
     private Long id;
     @Column(name = "name")
     private String name;
+
+    public Language(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @ManyToMany(mappedBy = "languages",
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},

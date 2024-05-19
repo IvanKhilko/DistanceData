@@ -4,6 +4,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.example.distancedata.cache.LRUCache;
 import org.example.distancedata.dto.ContinentDTO;
@@ -40,7 +43,6 @@ public class ContinentServiceImpl implements DataService<Continent, ContinentDTO
         return i + 1;
     }
 
-
     @Override
     public Continent create(final Continent continent) {
         cache.put(continent.getId(), continent);
@@ -66,21 +68,8 @@ public class ContinentServiceImpl implements DataService<Continent, ContinentDTO
         return optionalContinent.get();
     }
 
-
-    @Override
-    public Continent getByID(final Long id) throws ResourceNotFoundException {
-        var optionalContinent = cache.get(id);
-        if (optionalContinent.isEmpty()) {
-            optionalContinent = continentRepository.getContinentById(id);
-            if (optionalContinent.isPresent()) {
-                cache.put(id, optionalContinent.get());
-            } else {
-                throw new ResourceNotFoundException(
-                        "Can't create continent with id = "
-                                + id + " already exist");
-            }
-        }
-        return optionalContinent.get();
+    public Continent getByID(Long id) {
+        return continentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -89,40 +78,14 @@ public class ContinentServiceImpl implements DataService<Continent, ContinentDTO
         continentRepository.save(continent);
     }
 
-    @Override
-    public void delete(final Long id)
-            throws ResourceNotFoundException {
-        if (getByID(id) != null) {
+    @Transactional
+    public void delete(Long id) throws ResourceNotFoundException {
+        Optional<Continent> continent = continentRepository.findById(id);
+        if (continent.isPresent()) {
             continentRepository.deleteById(id);
-            cache.remove(id);
         } else {
-            throw new ResourceNotFoundException(
-                    "Can't delete continent with id = " + id + DONT_EXIST);
+            throw new ResourceNotFoundException("Can't delete continent with id = " + id + " because it does not exist.");
         }
-    }
-
-    @Override
-    public void createBulk(final List<ContinentDTO> list)
-            throws BadRequestException {
-        List<Continent> continents = list.stream()
-                .map(continentDTO -> Continent.builder()
-                        .name(continentDTO.getName())
-                        .build())
-                .toList();
-        String sql = "INSERT into continent (name) VALUES (?)";
-
-        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(final PreparedStatement statement,
-                                  final int i) throws SQLException {
-                statement.setString(1, continents.get(i).getName());
-            }
-
-            @Override
-            public int getBatchSize() {
-                return continents.size();
-            }
-        });
     }
 
 
@@ -167,23 +130,18 @@ public class ContinentServiceImpl implements DataService<Continent, ContinentDTO
         update(updatedContinent);
     }
 
-
     @SuppressWarnings("checkstyle:MissingJavadocMethod")
     public void modifyLanguage(final ContinentDTO continentDto,
                                final boolean deleteFlag)
             throws ResourceNotFoundException {
-        try {
-            var continent = getByID(continentDto.getId());
-            for (String language : continentDto.getLanguages()) {
-                var tempLanguage = languageRepository.getByName(language);
-                tempLanguage.ifPresent(!deleteFlag
-                        ? continent::addLanguage : continent::removeLanguage);
-            }
-            cache.remove(continent.getId());
-            continentRepository.save(continent);
-        } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException("Cant modify language");
+        var continent = getByID(continentDto.getId());
+        for (String language : continentDto.getLanguages()) {
+            var tempLanguage = languageRepository.getByName(language);
+            tempLanguage.ifPresent(!deleteFlag
+                    ? continent::addLanguage : continent::removeLanguage);
         }
+        cache.remove(continent.getId());
+        continentRepository.save(continent);
     }
 
     public List<Continent> getByLanguage(final Long id)
@@ -193,5 +151,57 @@ public class ContinentServiceImpl implements DataService<Continent, ContinentDTO
             throw new ResourceNotFoundException("No language with this name");
         }
         return continentRepository.findAllContinentWithLanguage(id);
+    }
+
+    public Continent updateContinent(Long id, String newName) throws Exception {
+        Continent continent = continentRepository.findById(id).orElseThrow(() -> new Exception("Континент не найден"));
+        continent.setName(newName);
+        return continentRepository.save(continent);
+    }
+
+    public List<Continent> findAll() {
+        return continentRepository.findAll();
+    }
+
+    public Continent findById(Long id) {
+        return continentRepository.findById(id).orElse(null);
+    }
+
+    public void save(Continent continent) {
+        continentRepository.save(continent);
+    }
+
+    public void deleteById(Long id) {
+        continentRepository.deleteById(id);
+    }
+
+    @Override
+    public void createBulk(final List<ContinentDTO> list)
+            throws BadRequestException {
+        List<Continent> continents = list.stream()
+                .map(continentDTO -> Continent.builder()
+                        .name(continentDTO.getName())
+                        .build())
+                .toList();
+        String sql = "INSERT into continent (name) VALUES (?)";
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(final PreparedStatement statement,
+                                  final int i) throws SQLException {
+                statement.setString(1, continents.get(i).getName());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return continents.size();
+            }
+        });
+    }
+    public Continent updateContinent(Long id, ContinentDTO continentDTO) throws Exception {
+        Continent continent = continentRepository.findById(id)
+                .orElseThrow(() -> new Exception("Континент не найден"));
+        continent.setName(continentDTO.getName()); // Обновляем имя континента
+        return continentRepository.save(continent); // Возвращаем обновленный континент
     }
 }

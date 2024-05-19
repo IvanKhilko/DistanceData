@@ -31,7 +31,7 @@ public class CountryServiceImpl implements DataService<Country, CountryDTO> {
     private final JdbcTemplate jdbcTemplate;
     private static final String DONT_EXIST = " doesn't exist";
 
-    private long findFreeId() {
+    public long findFreeId() {
         var list = read();
         long i = 1;
         for (Country countryInfo : list) {
@@ -43,7 +43,7 @@ public class CountryServiceImpl implements DataService<Country, CountryDTO> {
         return i + 1;
     }
 
-    private long findFreeId(final HashSet<Long> usedIndexes) {
+    public long findFreeId(final HashSet<Long> usedIndexes) {
         // Собираем все существующие идентификаторы из базы данных
         var existingIds = new HashSet<Long>();
         var countries = read(); // Предполагается, что read() возвращает все языки
@@ -62,6 +62,7 @@ public class CountryServiceImpl implements DataService<Country, CountryDTO> {
 
         return id; // Возвращаем первый свободный идентификатор
     }
+
     public Country createWithContinent(final CountryDTO country,
                                   final Continent continent)
             throws BadRequestException {
@@ -138,7 +139,6 @@ public class CountryServiceImpl implements DataService<Country, CountryDTO> {
         }
         return optionalCountry.get();
     }
-
 
     @Override
     public void update(final Country country) throws ResourceNotFoundException {

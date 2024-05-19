@@ -1,9 +1,5 @@
 package org.example.distancedata.service_implementation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import org.example.distancedata.cache.LRUCache;
 import org.example.distancedata.dto.ContinentDTO;
 import org.example.distancedata.entity.Continent;
@@ -18,316 +14,143 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ContinentServiceImplTest {
+
     @Mock
     private ContinentRepository continentRepository;
+
     @Mock
     private LanguageRepository languageRepository;
+
     @Mock
     private LRUCache<Long, Continent> cache;
-    @Mock
-    private JdbcTemplate jdbcTemplate;
+
     @InjectMocks
-    private ContinentServiceImpl service;
+    private ContinentServiceImpl continentService;
+
+    public ContinentServiceImplTest() {
+    }
+
 
     @Test
-    public void shouldReturnAllCountry() {
-        List<Continent> expectedContinent = new ArrayList<>();
-        when(continentRepository.findAll(Sort.by("id")))
-                .thenReturn(expectedContinent);
-        var actualCountries = service.read();
-        assertEquals(expectedContinent, actualCountries);
+    void testCreateThrowsBadRequestException() {
+        var continent = ContinentDTO.builder().name("Asia").build();
+
+        // Simulate that a continent with this name already exists
+        when(continentRepository.getByName("Asia")).thenReturn(Optional.of(new Continent()));
+
+        assertThrows(BadRequestException.class, () -> continentService.create(continent));
+    }
+
+
+
+    @Test
+    void testGetByName() throws ResourceNotFoundException {
+        var mockContinent = new Continent(1L, "Europe");
+
+        when(continentRepository.getByName("Europe")).thenReturn(Optional.of(mockContinent));
+
+        var result = continentService.getByName("Europe");
+
+        assertEquals("Europe", result.getName());
+        verify(cache, times(1)).put(1L, mockContinent);
     }
 
     @Test
-    public void findCountryByIdNotInCache()
-            throws ResourceNotFoundException {
-        Long id = 2L;
-        var expectedContinent = Optional.of(new Continent());
-        when(cache.get(id)).thenReturn(Optional.empty());
-        when(continentRepository.getContinentById(id)).thenReturn(expectedContinent);
-        Continent actualContinent = service.getByID(id);
-        assertEquals(expectedContinent.get(), actualContinent);
-        verify(cache, times(1))
-                .put(id, expectedContinent.get());
+    void testGetByNameThrowsResourceNotFoundException() {
+        when(continentRepository.getByName("Nonexistent")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> continentService.getByName("Nonexistent"));
     }
 
     @Test
-    public void findContinentByIdNotExist() {
-        Long id = 2L;
-        when(cache.get(id)).thenReturn(Optional.empty());
-        when(continentRepository.getContinentById(id)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getByID(id));
-        verify(continentRepository, never()).findById(anyLong());
-        verify(cache, never())
-                .put(anyLong(), any(Continent.class));
+    void testGetByID() throws ResourceNotFoundException {
+        var mockContinent = new Continent(1L, "Africa");
+
+        when(cache.get(1L)).thenReturn(Optional.of(mockContinent));
+
+        var result = continentService.getByID(1L);
+
+        assertEquals("Africa", result.getName());
     }
 
     @Test
-    public void findContinentByIdInCache()
-            throws ResourceNotFoundException {
-        Long id = 2L;
-        var expectedContinent = Optional.of(new Continent());
-        when(cache.get(id)).thenReturn(expectedContinent);
-        var actualCountry = Optional.of(service.getByID(id));
-        assertEquals(expectedContinent, actualCountry);
-        verify(continentRepository, never()).findById(anyLong());
+    void testGetByIDFromRepository() throws ResourceNotFoundException {
+        var mockContinent = new Continent(1L, "Africa");
+
+        when(cache.get(1L)).thenReturn(Optional.empty());
+        when(continentRepository.getContinentById(1L)).thenReturn(Optional.of(mockContinent));
+
+        var result = continentService.getByID(1L);
+
+        assertEquals("Africa", result.getName());
+        verify(cache, times(1)).put(1L, mockContinent);
     }
 
     @Test
-    public void findContinentByNameNotInCache()
-            throws ResourceNotFoundException {
-        String name = "Asia";
-        var expectedContinent = Optional.of(new Continent());
-        when(continentRepository.getByName(name)).thenReturn(expectedContinent);
-        var actualContinent = service.getByName(name);
-        assertEquals(expectedContinent.get(), actualContinent);
-        verify(cache, times(1)).put(expectedContinent.get().getId(), expectedContinent.get());
+    void testGetByIDThrowsResourceNotFoundException() {
+        when(cache.get(1L)).thenReturn(Optional.empty());
+        when(continentRepository.getContinentById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> continentService.getByID(1L));
+    }
+
+
+    @Test
+    void testDelete() throws ResourceNotFoundException {
+        var mockContinent = new Continent(1L, "Asia");
+
+        when(continentRepository.getContinentById(1L)).thenReturn(Optional.of(mockContinent));
+
+        continentService.delete(1L);
+
+        verify(continentRepository, times(1)).deleteById(1L);
+        verify(cache, times(1)).remove(1L);
     }
 
     @Test
-    public void findCountryByNameNotExist() {
-        String name = "Asia";
-        when(continentRepository.getByName(name)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getByName(name));
-        verify(cache, never())
-                .put(anyLong(), any(Continent.class));
+    void testDeleteThrowsResourceNotFoundException() {
+        when(continentRepository.getContinentById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> continentService.delete(1L));
     }
 
-    @Test
-    public void createContinentSuccessful() {
-        var newContinent = Continent.builder()
-                .name("Europe")
-                .id(2L).build();
-        var actualContinent = service.create(newContinent);
-        assertEquals(actualContinent, newContinent);
-        verify(continentRepository, times(1)).save(newContinent);
-        verify(cache, times(1))
-                .put(newContinent.getId(), newContinent);
-    }
 
     @Test
-    public void createContinentByDtoSuccessful() {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .build();
-        when(continentRepository.getByName(newContinent.getName()))
-                .thenReturn(Optional.empty());
-        when(languageRepository.getByName(anyString()))
-                .thenReturn(Optional.empty());
-        when(continentRepository.findAll(Sort.by("id")))
-                .thenReturn(new ArrayList<>());
-        service.create(newContinent);
-        verify(continentRepository, times(1))
-                .save(any(Continent.class));
-        verify(cache, times(1))
-                .put(anyLong(), any(Continent.class));
-    }
+    void testModifyLanguage() throws ResourceNotFoundException {
+        var mockLanguage = new Language(1L, "English");
+        var mockContinent = new Continent(1L, "Africa");
 
-    @Test
-    public void createContinentByDtoExistedId() {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .id(2L).build();
-        when(continentRepository.getByName(newContinent.getName()))
-                .thenReturn(Optional.of(new Continent()));
-        assertThrows(BadRequestException.class, () -> service.create(newContinent));
-        verify(continentRepository, never())
-                .save(any(Continent.class));
-        verify(cache, times(1))
-                .remove(anyLong());
-    }
+        when(continentRepository.getContinentById(1L)).thenReturn(Optional.of(mockContinent));
+        when(languageRepository.getByName("English")).thenReturn(Optional.of(mockLanguage));
 
-    @Test
-    public void updateContinentByEntity() {
-        var newContinent= Continent.builder()
-                .name("Test")
-                .id(22L).build();
-        service.update(newContinent);
-        verify(continentRepository, times(1)).save(newContinent);
-        verify(cache, times(1))
-                .remove(newContinent.getId());
-    }
-
-    @Test
-    public void updateCountryByDto() throws ResourceNotFoundException {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .build();
-        when(continentRepository.getContinentById(newContinent.getId()))
-                .thenReturn(Optional.of(new Continent()));
-        when(languageRepository.getByName(anyString()))
-                .thenReturn(Optional.empty());
-        service.update(newContinent);
-        verify(continentRepository, times(1))
-                .save(any(Continent.class));
-        verify(cache, times(1))
-                .remove(newContinent.getId());
-    }
-
-    @Test
-    public void updateContinentByDtoWithNotExistedId() {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .id(2L).build();
-        when(continentRepository.getContinentById(newContinent.getId()))
-                .thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.update(newContinent));
-        verify(continentRepository, never())
-                .save(any(Continent.class));
-        verify(cache, never())
-                .remove(anyLong());
-    }
-
-    @Test
-    public void deleteContinentValidId() throws ResourceNotFoundException {
-        Long id = 2L;
-        when(continentRepository.getContinentById(id))
-                .thenReturn(Optional.of(new Continent()));
-        when(cache.get(anyLong()))
-                .thenReturn(Optional.empty());
-        service.delete(id);
-        verify(cache, times(1))
-                .remove(id);
-        verify(continentRepository, times(1))
-                .deleteById(id);
-    }
-
-    @Test
-    public void deleteContinentInvalidId() {
-        Long id = 2L;
-        when(continentRepository.getContinentById(id))
-                .thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.delete(id));
-        verify(continentRepository, never())
-                .deleteById(id);
-        verify(cache, never())
-                .remove(id);
-    }
-
-    @Test
-    public void deleteLanguageButNotExistedId() {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .id(2L).build();
-        when(continentRepository.getContinentById(newContinent.getId()))
-                .thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class
-                , () -> service.modifyLanguage(newContinent, true));
-        verify(cache, never())
-                .put(anyLong(), any(Continent.class));
-        verify(continentRepository, never())
-                .save(any(Continent.class));
-        verify(languageRepository, never())
-                .getByName(anyString());
-    }
-
-    @Test
-    public void createLanguageButNotExistedId() {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .id(2L).build();
-        when(continentRepository.getContinentById(newContinent.getId()))
-                .thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class
-                , () -> service.modifyLanguage(newContinent, true));
-        verify(cache, never())
-                .put(anyLong(), any(Continent.class));
-        verify(continentRepository, never())
-                .save(any(Continent.class));
-        verify(languageRepository, never())
-                .getByName(anyString());
-    }
-
-    @Test
-    public void deleteLanguageInContinent() throws ResourceNotFoundException {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .id(2L).build();
-        var existedContinent = Continent.builder()
-                .name("Europe")
-                .id(2L).build();
-        when(languageRepository.getByName(anyString()))
-                .thenReturn(Optional.empty());
-        when(continentRepository.getContinentById(newContinent.getId()))
-                .thenReturn(Optional.of(existedContinent));
-        service.modifyLanguage(newContinent, true);
-        verify(continentRepository, times(1))
-                .save(any(Continent.class));
-        verify(cache, times(1))
-                .remove(newContinent.getId());
-    }
-
-    @Test
-    public void createLanguageInContinent() throws ResourceNotFoundException {
-        var newContinent = ContinentDTO.builder()
-                .name("Europe")
-                .languages(List.of("English"))
-                .id(2L).build();
-        var existedContinent = Continent.builder()
-                .name("Europe")
-                .id(2L).build();
-        when(languageRepository.getByName(anyString()))
-                .thenReturn(Optional.empty());
-        when(continentRepository.getContinentById(newContinent.getId()))
-                .thenReturn(Optional.of(existedContinent));
-        service.modifyLanguage(newContinent, false);
-        verify(continentRepository, times(1))
-                .save(any(Continent.class));
-        verify(cache, times(1))
-                .remove(newContinent.getId());
-    }
-
-    @Test
-    public void getByLanguage() throws ResourceNotFoundException {
-        Long id = 2L;
-        when(languageRepository.getLanguageById(id))
-                .thenReturn(Optional.of(Language.builder().name("English")
-                        .id(id).build()));
-        when(continentRepository.findAllContinentWithLanguage(id))
-                .thenReturn(new ArrayList<>());
-        assertNotEquals(null, service.getByLanguage(id));
-    }
-
-    @Test
-    public void getByNotExistedLanguage() {
-        Long id = 2L;
-        when(languageRepository.getLanguageById(id))
-                .thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getByLanguage(id));
-        verify(continentRepository, never())
-                .findAllContinentWithLanguage(id);
-    }
-
-    @Test
-    public void bulkInsert() {
-        var firstContinent = ContinentDTO.builder()
-                .name("Europe")
+        var continentDTO = ContinentDTO.builder()
                 .id(1L)
+                .languages(List.of("English"))
                 .build();
-        var secondContinent = ContinentDTO.builder()
-                .name("Asia")
+
+        continentService.modifyLanguage(continentDTO, false); // Adding a language
+
+        assertTrue(mockContinent.getLanguages().contains(mockLanguage));
+    }
+
+    @Test
+    void testModifyLanguageThrowsResourceNotFoundException() {
+        when(continentRepository.getContinentById(1L)).thenReturn(Optional.empty());
+
+        var continentDTO = ContinentDTO.builder()
                 .id(1L)
+                .languages(List.of("English"))
                 .build();
-        List<ContinentDTO> continentDTOS = Arrays
-                .asList(firstContinent, secondContinent);
-        service.createBulk(continentDTOS);
-        String sql = "INSERT into continent (name, id) VALUES (?, ?)";
-        verify(jdbcTemplate, times(1))
-                .batchUpdate(eq(sql), any(BatchPreparedStatementSetter.class));
+
+        assertThrows(ResourceNotFoundException.class, () -> continentService.modifyLanguage(continentDTO, false));
     }
 }

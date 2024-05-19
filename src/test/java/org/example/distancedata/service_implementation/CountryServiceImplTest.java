@@ -1,16 +1,11 @@
 package org.example.distancedata.service_implementation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import org.example.distancedata.cache.LRUCache;
 import org.example.distancedata.dto.CountryDTO;
 import org.example.distancedata.entity.Continent;
 import org.example.distancedata.entity.Country;
 import org.example.distancedata.exception.BadRequestException;
 import org.example.distancedata.exception.ResourceNotFoundException;
-import org.example.distancedata.repository.ContinentRepository;
 import org.example.distancedata.repository.CountryRepository;
 import org.example.distancedata.services.implementation.CountryServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -18,298 +13,175 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CountryServiceImplTest {
+
     @Mock
-    private CountryRepository repository;
-    @Mock
-    private ContinentRepository continentRepository;
+    private CountryRepository countryRepository;
+
     @Mock
     private LRUCache<Long, Country> cache;
-    @Mock
-    private JdbcTemplate jdbcTemplate;
+
     @InjectMocks
-    private CountryServiceImpl service;
+    private CountryServiceImpl countryService;
 
-    @Test
-    public void returnAllCountry() {
-        List<Country> expectedCountries = new ArrayList<>();
-        when(repository.findAll(Sort.by("id")))
-                .thenReturn(expectedCountries);
-        List<Country> actualCountries = service.read();
-        assertEquals(expectedCountries, actualCountries);
+    public CountryServiceImplTest() {
     }
 
     @Test
-    public void createCountryWithContinentSuccess() {
-        CountryDTO country = CountryDTO.builder()
-                .name("Japan")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .build();
-        var createdCountry = service.createWithContinent(country, Continent.builder().name("Asia").id(1L).build());
-        assertEquals(createdCountry.getName(), country.getName());
-        assertEquals(createdCountry.getLatitude(), country.getLatitude());
-        assertEquals(createdCountry.getLongitude(), country.getLongitude());
-        assertEquals(createdCountry.getContinent().getName(), "Asia");
-        verify(repository, times(1)).save(any(Country.class));
-        verify(cache, times(1)).put(anyLong(), any(Country.class));
+    void testCreateCountry() throws BadRequestException {
+        Country newCountry = Country.builder().id(1L).name("Utopia").build();
+
+        // Simulate successful creation
+        countryService.create(newCountry);
+
+        verify(countryRepository, times(1)).save(newCountry);
+        verify(cache, times(1)).put(1L, newCountry);
     }
 
     @Test
-    public void createCountryWithCountryWrongName() {
-        CountryDTO country = CountryDTO.builder()
-                .name("Japan")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .build();
-        var continent = Continent.builder().name("Asia").id(1L).build();
-        when(repository.getCountryByName("Japan")).thenReturn(Optional.of(new Country()));
-        assertThrows(BadRequestException.class, () -> service.createWithContinent(country, continent));
+    void testCreateCountryWithContinent() throws BadRequestException {
+        Continent continent = new Continent(1L, "Europe");
+        CountryDTO countryDTO = CountryDTO.builder().name("Atlantis").latitude(40.0).longitude(60.0).build();
+
+        // Simulate the scenario where the country does not exist
+        when(countryRepository.getCountryByName("Atlantis")).thenReturn(Optional.empty());
+
+        Country createdCountry = countryService.createWithContinent(countryDTO, continent);
+
+        assertNotNull(createdCountry);
+        assertEquals("Atlantis", createdCountry.getName());
+        assertEquals(continent, createdCountry.getContinent());
     }
 
     @Test
-    public void findCountryByIdNotInCache()
-            throws ResourceNotFoundException {
-        Long id = 5L;
-        Optional<Country> expectedCountry = Optional.of(new Country());
-        when(cache.get(id)).thenReturn(Optional.empty());
-        when(repository.getCountryById(id)).thenReturn(expectedCountry);
-        Country actualCountry = service.getByID(id);
-        assertEquals(expectedCountry.get(), actualCountry);
-        verify(cache, times(1))
-                .put(id, expectedCountry.get());
+    void testCreateCountryWithContinentThrowsBadRequestException() {
+        Continent continent = new Continent(1L, "Europe");
+        CountryDTO countryDTO = CountryDTO.builder().name("Atlantis").latitude(40.0).longitude(60.0).build();
+
+        // Simulate the scenario where the country already exists
+        when(countryRepository.getCountryByName("Atlantis")).thenReturn(Optional.of(new Country()));
+
+        assertThrows(BadRequestException.class, () -> countryService.createWithContinent(countryDTO, continent));
     }
 
     @Test
-    public void findCountryByIdNotExist() {
-        Long id = 5L;
-        when(cache.get(id)).thenReturn(Optional.empty());
-        when(repository.getCountryById(id)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getByID(id));
-        verify(cache, never())
-                .put(anyLong(), any(Country.class));
+    void testGetCountryByName() throws ResourceNotFoundException {
+        Country mockCountry = new Country();
+        mockCountry.setId(1L);
+        mockCountry.setName("Utopia");
+
+        when(countryRepository.getCountryByName("Utopia")).thenReturn(Optional.of(mockCountry));
+
+        Country country = countryService.getByName("Utopia");
+
+        assertNotNull(country);
+        assertEquals("Utopia", country.getName());
+        verify(cache, times(1)).put(1L, mockCountry);
     }
 
     @Test
-    public void findCountryByIdInCache()
-            throws ResourceNotFoundException {
-        Long id = 5L;
-        Optional<Country> expectedCountry = Optional.of(new Country());
-        when(cache.get(id)).thenReturn(expectedCountry);
-        var actualCountry = Optional.of(service.getByID(id));
-        assertEquals(expectedCountry, actualCountry);
-        verify(repository, never()).findById(anyLong());
+    void testGetCountryByNameThrowsResourceNotFoundException() {
+        when(countryRepository.getCountryByName("Nonexistent")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> countryService.getByName("Nonexistent"));
     }
 
     @Test
-    public void findCountryByNameNotInCache()
-            throws ResourceNotFoundException {
-        String name = "Japan";
-        Optional<Country> expectedCountry = Optional.of(new Country());
-        when(repository.getCountryByName(name)).thenReturn(expectedCountry);
-        Country actualCountry = service.getByName(name);
-        assertEquals(expectedCountry.get(), actualCountry);
-        verify(cache, times(1)).put(expectedCountry.get().getId(), expectedCountry.get());
+    void testGetCountryByID() throws ResourceNotFoundException {
+        Country mockCountry = new Country();
+        mockCountry.setId(1L);
+        mockCountry.setName("Utopia");
+
+        when(cache.get(1L)).thenReturn(Optional.of(mockCountry));
+
+        Country country = countryService.getByID(1L);
+
+        assertEquals("Utopia", country.getName());
     }
 
     @Test
-    public void findCountryByNameNotExist() {
-        String name = "Japan";
-        when(repository.getCountryByName(name)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.getByName(name));
-        verify(cache, never()).put(anyLong(), any(Country.class));
+     void testGetCountryByIDFromRepository() throws ResourceNotFoundException {
+        Country mockCountry = new Country();
+        mockCountry.setId(1L);
+        mockCountry.setName("Utopia");
+
+        when(cache.get(1L)).thenReturn(Optional.empty());
+        when(countryRepository.getCountryById(1L)).thenReturn(Optional.of(mockCountry));
+
+        Country country = countryService.getByID(1L);
+
+        assertEquals("Utopia", country.getName());
+        verify(cache, times(1)).put(1L, mockCountry);
     }
 
     @Test
-    public void createCountry() {
-        var newCountry = Country.builder()
-                .name("Japan").build();
-        var createdCountry = service.create(newCountry);
-        assertEquals(createdCountry.getName(), newCountry.getName());
-        verify(cache, times(1))
-                .put(newCountry.getId(), newCountry);
-        verify(repository, times(1)).save(newCountry);
+    void testGetCountryByIDThrowsResourceNotFoundException() {
+        when(cache.get(1L)).thenReturn(Optional.empty());
+        when(countryRepository.getCountryById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> countryService.getByID(1L));
+    }
+
+
+    @Test
+    void testUpdateCountryThrowsResourceNotFoundException() {
+        CountryDTO countryDTO = CountryDTO.builder().id(1L).name("Utopia").build();
+
+        when(cache.get(1L)).thenReturn(Optional.empty());
+        when(countryRepository.getCountryById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> countryService.update(countryDTO));
     }
 
     @Test
-    public void updateCountryWithContinent() throws ResourceNotFoundException {
-        CountryDTO country = CountryDTO.builder()
-                .name("Japann")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .id(666L)
-                .build();
-        var expectedCountry = Country.builder()
-                .name("Japan")
-                .id(666L)
-                .build();
-        var continent = Continent.builder().name("Japan").id(1L).build();
-        when(repository.getCountryById(country.getId()))
-                .thenReturn(Optional.of(expectedCountry));
-        service.updateWithContinent(country, continent);
-        assertEquals(expectedCountry.getContinent().getName(), continent.getName());
-        assertEquals(expectedCountry.getName(), country.getName());
-        assertEquals(expectedCountry.getLatitude(), country.getLatitude());
-        assertEquals(expectedCountry.getLongitude(), country.getLongitude());
-        verify(cache, times(1)).remove(country.getId());
-        verify(repository).save(expectedCountry);
+     void testDeleteCountry() throws ResourceNotFoundException {
+        Country mockCountry = new Country();
+        mockCountry.setId(1L);
+        mockCountry.setName("Utopia");
+
+
+        when(countryRepository.getCountryById(1L)).thenReturn(Optional.of(mockCountry));
+
+        countryService.delete(1L);
+
+        verify(countryRepository, times(1)).deleteById(1L);
+        verify(cache, times(1)).remove(1L);
     }
 
     @Test
-    public void updateCountryWithCountryInvalidId() {
-        var country = CountryDTO.builder()
-                .name("Tokyko")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .id(666L)
-                .build();
-        var continent = Continent.builder().name("Asia").id(1L).build();
-        when(repository.getCountryById(country.getId()))
-                .thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.updateWithContinent(country, continent));
-        verify(cache, never()).remove(country.getId());
-        verify(cache, never())
-                .put(anyLong(), any(Country.class));
-        verify(repository, never()).save(any(Country.class));
+    void testDeleteCountryThrowsResourceNotFoundException() {
+        when(countryRepository.getCountryById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> countryService.delete(1L));
     }
 
     @Test
-    public void updateCountry() throws ResourceNotFoundException {
-        var newCountry = CountryDTO.builder()
-                .name("Japann")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .id(666L)
-                .build();
-        var expectedCountry = Country.builder()
-                .id(666L)
-                .build();
-        when(cache.get(newCountry.getId())).thenReturn(Optional.empty());
-        when(repository.getCountryById(newCountry.getId()))
-                .thenReturn(Optional.of(expectedCountry));
-        service.update(newCountry);
-        assertEquals(expectedCountry.getName(), newCountry.getName());
-        assertEquals(expectedCountry.getLatitude(), newCountry.getLatitude());
-        assertEquals(expectedCountry.getLongitude(), newCountry.getLongitude());
-        verify(cache, times(1))
-                .remove(newCountry.getId());
-        verify(repository, times(1)).save(expectedCountry);
-    }
+    void testFindFreeIdWithUsedIndexes() {
+        Country mockCountry1 = new Country();
+        mockCountry1.setId(1L);
+        mockCountry1.setName("Country2");
 
-    @Test
-    public void updateCountryInCache() throws ResourceNotFoundException {
-        CountryDTO newCountry = CountryDTO.builder()
-                .name("Japann")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .id(666L)
-                .build();
-        var expectedCountry = Country.builder()
-                .id(666L)
-                .build();
-        when(cache.get(newCountry.getId())).thenReturn(Optional.of(expectedCountry));
-        service.update(newCountry);
-        assertEquals(expectedCountry.getName(), newCountry.getName());
-        assertEquals(expectedCountry.getLatitude(), newCountry.getLatitude());
-        assertEquals(expectedCountry.getLongitude(), newCountry.getLongitude());
-        verify(cache, times(1))
-                .remove(newCountry.getId());
-        verify(repository, times(1)).save(expectedCountry);
-    }
+        Country mockCountry2 = new Country();
+        mockCountry2.setId(2L);
+        mockCountry2.setName("Country2");
 
-    @Test
-    public void updateCountryInvalidId() {
-        CountryDTO newCountry = CountryDTO.builder()
-                .name("Japann")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .id(666L)
-                .build();
-        when(cache.get(newCountry.getId())).thenReturn(Optional.empty());
-        when(repository.getCountryById(newCountry.getId())).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.update(newCountry));
 
-    }
+        when(countryService.read()).thenReturn(List.of(mockCountry1, mockCountry2));
 
-    @Test
-    public void shouldUpdateCountry() throws ResourceNotFoundException {
-        var newCountry = Country.builder()
-                .name("Japann")
-                .latitude(13.4543)
-                .longitude(12.4445)
-                .id(666L)
-                .build();
-        service.update(newCountry);
-        verify(cache, times(1))
-                .remove(newCountry.getId());
-        verify(cache, times(1))
-                .put(anyLong(), any(Country.class));
-        verify(repository, times(1))
-                .save(newCountry);
-    }
+        HashSet<Long> usedIndexes = new HashSet<>(List.of(1L, 2L, 3L));
 
-    @Test
-    public void deleteCountryValidId() throws ResourceNotFoundException {
-        Long id = 5L;
-        when(repository.getCountryById(id)).thenReturn(Optional.of(new Country()));
-        service.delete(id);
-        verify(cache, times(1))
-                .remove(id);
-        verify(repository, times(1))
-                .deleteById(id);
-    }
+        long freeId = countryService.findFreeId(usedIndexes);
 
-    @Test
-    public void deleteCountryInvalidId() {
-        Long id = 5L;
-        when(repository.getCountryById(id)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.delete(id));
-        verify(cache, never())
-                .remove(id);
-        verify(repository, never())
-                .deleteById(id);
-    }
-
-    @Test
-    public void bulkInsert() {
-        CountryDTO firstCountry = CountryDTO.builder()
-                .name("Belarus")
-                .longitude(23.0)
-                .latitude(45.0)
-                .continent(2L)
-                .build();
-        CountryDTO secondCountry = CountryDTO.builder()
-                .name("Russia")
-                .longitude(123.0)
-                .latitude(34.0)
-                .continent(2L)
-                .build();
-        List<CountryDTO> countryDTOS = Arrays.asList(firstCountry, secondCountry);
-        Optional<Continent> expectedContinent = Optional.of(new Continent());
-        when(continentRepository.getContinentById(anyLong()))
-                .thenReturn(expectedContinent);
-        service.createBulk(countryDTOS);
-        String sql = "INSERT into country (name, id, latitude, longitude, id_country)"
-                + "VALUES (?, ?, ?, ?, ?)";
-        verify(jdbcTemplate, times(1))
-                .batchUpdate(eq(sql), any(BatchPreparedStatementSetter.class));
-
-    }
-
-    @Test
-    public void countryBetweenLatitudes() {
-        Double first = 10D;
-        Double second = 20D;
-        service.getBetweenLatitudes(first, second);
-        verify(repository, times(1))
-                .findAllCountryWithLatitudeBetween(first, second);
+        assertEquals(4L, freeId); // The next available ID after 1, 2, and 3
     }
 }

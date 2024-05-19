@@ -1,9 +1,7 @@
 package org.example.distancedata.service_implementation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import org.example.distancedata.cache.LRUCache;
 import org.example.distancedata.dto.LanguageDTO;
 import org.example.distancedata.entity.Language;
@@ -37,6 +35,7 @@ public class LanguageServiceImplTest {
 
     @InjectMocks
     private LanguageServiceImpl service;
+
 
     @Test
     public void shouldReturnAllLanguage() {
@@ -244,4 +243,57 @@ public class LanguageServiceImplTest {
         verify(jdbcTemplate, times(1))
                 .batchUpdate(eq(sql), any(BatchPreparedStatementSetter.class));
     }
+
+    @Test
+    void shouldFindNextAvailableIdWhenAllIdsUsed() {
+        var existingLanguages = List.of(
+                new Language(1L, "English"),
+                new Language(2L, "French"),
+                new Language(3L, "Spanish")
+        );
+
+        var usedIndexes = new HashSet<Long>(); // No used indexes provided
+
+        when(service.read()).thenReturn(existingLanguages); // Mock read() response
+
+        long freeId = service.findFreeId(usedIndexes);
+
+        assertEquals(4L, freeId, "Next free ID should be 4");
+    }
+
+    @Test
+    void shouldFindNextAvailableIdWhenThereAreGaps() {
+        var existingLanguages = List.of(
+                new Language(1L, "English"),
+                new Language(3L, "French"),
+                new Language(5L, "Spanish")
+        );
+
+        var usedIndexes = new HashSet<Long>(); // No used indexes provided
+
+        when(service.read()).thenReturn(existingLanguages);
+
+        long freeId = service.findFreeId(usedIndexes);
+
+        assertEquals(2L, freeId, "Next free ID should be 2");
+    }
+
+    @Test
+    void shouldConsiderUsedIndexes() {
+        var existingLanguages = List.of(
+                new Language(1L, "English"),
+                new Language(2L, "French"),
+                new Language(3L, "Spanish")
+        );
+
+        var usedIndexes = new HashSet<Long>(List.of(4L)); // Index 4 is already used
+
+        when(service.read()).thenReturn(existingLanguages);
+
+        long freeId = service.findFreeId(usedIndexes);
+
+        assertEquals(5L, freeId, "Next free ID should be 5");
+    }
+
+
 }

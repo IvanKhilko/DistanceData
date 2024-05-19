@@ -20,7 +20,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @AllArgsConstructor
 public class LanguageServiceImpl implements DataService<Language, LanguageDTO> {
@@ -35,7 +34,6 @@ public class LanguageServiceImpl implements DataService<Language, LanguageDTO> {
         cache.put(language.getId(), language);
         return language;
     }
-
 
     @Override
     public List<Language> read() {
@@ -108,6 +106,7 @@ public class LanguageServiceImpl implements DataService<Language, LanguageDTO> {
                 .map(languageDTO -> Language.builder()
                         .name(languageDTO.getName()).build()).toList();
         String sql = "INSERT into language (name, id) VALUES (?, ?)";
+
         var indexes = new HashSet<Long>();
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
@@ -158,7 +157,7 @@ public class LanguageServiceImpl implements DataService<Language, LanguageDTO> {
         return i + 1;
     }
 
-    private long findFreeId(final HashSet<Long> usedIndexes) {
+    public long findFreeId(final HashSet<Long> usedIndexes) {
         // Собираем все существующие идентификаторы из базы данных
         var existingIds = new HashSet<Long>();
         var languages = read(); // Предполагается, что read() возвращает все языки

@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "country")
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Country{
+public class Country  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -24,6 +23,14 @@ public class Country{
     private Double latitude;
     @Column(name = "longitude")
     private Double longitude;
+
+    public Country(Long id, String name, Double latitude, Double longitude, Continent continent) {
+        this.id = id;
+        this.name = name;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.continent = continent;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})

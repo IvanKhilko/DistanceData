@@ -1,112 +1,95 @@
 package org.example.distancedata.controllers;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import org.example.distancedata.aspect.AspectAnnotation;
 import org.example.distancedata.dto.ContinentDTO;
 import org.example.distancedata.entity.Continent;
-import org.example.distancedata.exception.BadRequestException;
+import org.example.distancedata.entity.Country;
 import org.example.distancedata.exception.ResourceNotFoundException;
 import org.example.distancedata.services.implementation.ContinentServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
-@Tag(name = "ContinentController")
-@RestController
-@RequestMapping("/api/continents")
-@AllArgsConstructor
+@Controller
 public class ContinentController {
+
     private final ContinentServiceImpl continentService;
 
-    @GetMapping(value = "/all", produces = "application/json")
-    public ResponseEntity<List<Continent>> getAll() {
-        return new ResponseEntity<>(continentService.read(), HttpStatus.OK);
+    public ContinentController(ContinentServiceImpl continentService) {
+        this.continentService = continentService;
     }
 
-    @AspectAnnotation
-    @GetMapping(value = "/info", produces = "application/json")
-    public ResponseEntity<Continent> getContinent(
-            final @RequestParam(name = "continent") String name)
-            throws ResourceNotFoundException {
-        var continent = continentService.getByName(name);
-        return new ResponseEntity<>(continent, HttpStatus.OK);
+    @GetMapping("/all")
+    public String getAll(Model model) {
+        model.addAttribute("continents", continentService.read());
+        return "all";
     }
 
-    @AspectAnnotation
-    @GetMapping(value = "/find", produces = "application/json")
-    public ResponseEntity<Continent> getContinentById(
-            final @RequestParam(name = "id") Long id)
-            throws ResourceNotFoundException {
-        var continent = continentService.getByID(id);
-        return new ResponseEntity<>(continent, HttpStatus.OK);
-    }
-
-    @AspectAnnotation
-    @PutMapping("/update")
-    public HttpStatus update(final @RequestBody ContinentDTO continentDto)
-            throws ResourceNotFoundException {
-        continentService.update(continentDto);
-        return HttpStatus.OK;
-    }
-
-    @AspectAnnotation
     @PostMapping("/create")
-    public HttpStatus create(final @RequestBody ContinentDTO continentDto)
-            throws BadRequestException {
-        continentService.create(continentDto);
-        return HttpStatus.OK;
+    public String createContinent(@RequestParam("name") String name, RedirectAttributes redirectAttributes) {
+        try {
+            // Создаем континент, используя переданное имя
+            Continent newContinent = new Continent(name);
+            continentService.create(newContinent); // Сохраняем континент в базу данных
+            // Добавляем атрибут для передачи названия созданного континента на главную страницу
+            redirectAttributes.addFlashAttribute("newContinentName", name);
+        } catch (Exception e) {
+            e.printStackTrace(); // Обработка ошибок
+            // Возвращаемся на главную страницу с сообщением об ошибке
+            return "redirect:/";
+        }
+        // Перенаправляем на главную страницу
+        return "redirect:/all";
     }
 
-    @AspectAnnotation
-    @PostMapping("/bulkCreate")
-    public HttpStatus bulkCreate(
-            @RequestBody final List<ContinentDTO> continents) {
-        continentService.createBulk(continents);
-        return HttpStatus.OK;
+    @PostMapping("/delete/{id}")
+    public RedirectView deleteContinent(@PathVariable("id") Long id) {
+        try {
+            continentService.delete(id);
+            // Перенаправляем на страницу со всеми континентами после успешного удаления
+            return new RedirectView("/all");
+        } catch (Exception e) {
+            // В случае ошибки перенаправляем на страницу ошибки или показываем сообщение об ошибке
+            RedirectView redirectView = new RedirectView("/error");
+            redirectView.addStaticAttribute("errorMessage", "Ошибка удаления континента: " + e.getMessage());
+            return redirectView;
+        }
+}
+
+
+
+    @PostMapping("/update/{id}/{newName}")
+    public String updateContinent(@PathVariable("id") Long id,
+                                  @PathVariable("newName") String newName,
+                                  Model model) {
+        try {
+            Continent updatedContinent = continentService.updateContinent(id, newName);
+            model.addAttribute("message", "Континент успешно обновлен: " + updatedContinent.getName());
+        } catch (Exception e) {
+            model.addAttribute("message", "Ошибка при обновлении континента: " + e.getMessage());
+        }
+        return "redirect:/all";
     }
 
-    @AspectAnnotation
-    @DeleteMapping("/delete")
-    public HttpStatus delete(final @RequestParam(name = "id") Long id)
-            throws ResourceNotFoundException {
-        continentService.delete(id);
-        return HttpStatus.OK;
+    @PostMapping("/update/{id}")
+    public ResponseEntity<?> updateContinent(@PathVariable("id") Long id,
+                                             @RequestBody ContinentDTO continentDTO) {
+        try {
+            Continent updatedContinent = continentService.updateContinent(id, continentDTO);
+            return ResponseEntity.ok(updatedContinent); // Возвращаем обновленный континент
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при обновлении континента: " + e.getMessage());
+        }
     }
 
-    @AspectAnnotation
-    @PutMapping("/add_language")
-    public HttpStatus addLanguages(
-            final @RequestBody ContinentDTO continentDto)
-            throws ResourceNotFoundException {
-        continentService.modifyLanguage(continentDto, false);
-        return HttpStatus.OK;
-    }
 
-    @AspectAnnotation
-    @PutMapping("/delete_language")
-    public HttpStatus deleteLanguages(
-            final @RequestBody ContinentDTO continentDto)
-            throws ResourceNotFoundException {
-        continentService.modifyLanguage(continentDto, true);
-        return HttpStatus.OK;
-    }
 
-    @AspectAnnotation
-    @GetMapping("/get_by_language")
-    public ResponseEntity<List<Continent>> getContinentsByLanguage(
-            final @RequestParam(name = "id") Long id)
-            throws ResourceNotFoundException {
-        var continents = continentService.getByLanguage(id);
-        return new ResponseEntity<>(continents, HttpStatus.OK);
+    @GetMapping("/")
+    public String index() {
+        return "index";
     }
-
 }

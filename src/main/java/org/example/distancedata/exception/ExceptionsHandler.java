@@ -19,6 +19,7 @@ public class ExceptionsHandler {
         return new ResponseEntity<>(exceptionDetails,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionDetails> resourceNotFoundException(
             final ResourceNotFoundException exception) {
